@@ -68,17 +68,21 @@ pub fn editor_code_actions(
                 // Double JSON serialization is performed to prevent parsing args as a TOML
                 // structure when they are passed back via lsp-execute-command.
                 let args = &serde_json::to_string(&command.arguments).unwrap();
-                let args = editor_quote(&serde_json::to_string(&args).unwrap());
-                let select_cmd = editor_quote(&format!("lsp-execute-command {} {}", cmd, args));
+                let unquoted_args = serde_json::to_string(&args).unwrap();
+                let args = editor_quote(&unquoted_args);
+                let cmd_string = format!("lsp-execute-command {} {}", cmd, args);
+                let select_cmd = editor_quote(&cmd_string);
                 format!("{} {}", title, select_cmd)
             }
             CodeActionOrCommand::CodeAction(action) => {
                 let title = editor_quote(&action.title);
                 // Double JSON serialization is performed to prevent parsing args as a TOML
                 // structure when they are passed back via lsp-apply-workspace-edit.
-                let edit = &serde_json::to_string(&action.edit.unwrap()).unwrap();
-                let edit = editor_quote(&serde_json::to_string(&edit).unwrap());
-                let select_cmd = editor_quote(&format!("lsp-apply-workspace-edit {}", edit));
+                let args = &serde_json::to_string(&command.arguments).unwrap();
+                let unquoted_args = serde_json::to_string(&args).unwrap();
+                let args = editor_quote(&unquoted_args);
+                let cmd_string = format!("lsp-apply-workspace-edit {} {}", cmd, args);
+                let select_cmd = editor_quote(&cmd_string);
                 format!("{} {}", title, select_cmd)
             }
         })

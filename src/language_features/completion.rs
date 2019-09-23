@@ -70,12 +70,14 @@ pub fn editor_completion(
                     .collect::<String>();
                 entry += &format!(" {{MenuInfo}}{:?}", k);
             }
+
             editor_quote(&format!(
                 "{}|{}|{}",
                 escape_bar(&x.insert_text.unwrap_or(x.label)),
                 escape_bar(&doc),
                 escape_bar(&entry),
             ))
+            .to_string()
         })
         .join(" ");
     let p = params.position;

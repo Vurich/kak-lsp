@@ -18,6 +18,8 @@ set-face global Reference MatchingChar
 
 # Display hover info anchored to the hovered position.
 declare-option -docstring "Display hover info anchored to the hovered position" bool lsp_hover_anchor false
+# Display hover info anchored to the hovered position.
+declare-option -docstring "When both diagnostics and hover info are available, what should be shown. By default the hover info is printed and then the diagnostics below. Options:'diagnostics_only', 'info_only', 'reverse', or 'default'" bool lsp_hover_precedence false
 # Completions request is sent only when this expression doesn't fail.
 # By default, it ensures that preceding character is not a whitespace.
 declare-option -docstring "Completions request is sent only when this expression does not fail" str lsp_completion_trigger %{execute-keys '<a-h><a-k>\S.\z<ret>'}
@@ -132,10 +134,13 @@ buffile   = "%s"
 filetype  = "%s"
 version   = %d
 method    = "textDocument/hover"
+
+params.info_precedence = "%s"
+
 [params.position]
 line      = %d
 column    = %d
-' "${kak_session}" "${kak_client}" "${kak_buffile}" "${kak_opt_filetype}" "${kak_timestamp}" ${kak_cursor_line} ${kak_cursor_column} | ${kak_opt_lsp_cmd} --request) > /dev/null 2>&1 < /dev/null & }
+' "${kak_session}" "${kak_client}" "${kak_buffile}" "${kak_opt_filetype}" "${kak_timestamp}" "$kak_opt_lsp_hover_precedence ${kak_cursor_line} ${kak_cursor_column} | ${kak_opt_lsp_cmd} --request) > /dev/null 2>&1 < /dev/null & }
 }
 
 define-command lsp-definition -docstring "Go to definition" %{

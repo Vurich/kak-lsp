@@ -120,6 +120,30 @@ pub struct PositionParams {
 }
 
 #[derive(Deserialize, Debug)]
+pub enum HoverPrecedence {
+    #[serde(rename = "diagnostics_only")]
+    DiagnosticsOnly,
+    #[serde(rename = "info_only")]
+    InfoOnly,
+    #[serde(rename = "reverse")]
+    DiagnosticsFirst,
+    #[serde(rename = "default")]
+    InfoFirst,
+}
+
+impl Default for HoverPrecedence {
+    fn default() -> Self {
+        HoverPrecedence::InfoFirst
+    }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct HoverParams {
+    pub position: KakounePosition,
+    pub info_precedence: HoverPrecedence,
+}
+
+#[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TextDocumentRenameParams {
     pub position: KakounePosition,

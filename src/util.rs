@@ -3,11 +3,13 @@ use crate::position::*;
 use crate::text_edit::*;
 use crate::types::*;
 use itertools::Itertools;
+use lazy_string_replace::LazyReplace;
 use libc;
 use lsp_types::request::GotoDefinitionResponse;
 use lsp_types::*;
 use ropey::Rope;
 use std::collections::HashMap;
+use std::fmt::Display;
 use std::fs::File;
 use std::io::{stderr, stdout, BufReader, Write};
 use std::os::unix::fs::DirBuilderExt;
@@ -107,13 +109,34 @@ pub fn format_document_symbol(
 }
 
 /// Escape Kakoune string wrapped into single quote
-pub fn editor_escape(s: &str) -> String {
-    s.replace("'", "''")
+pub fn editor_escape(s: &str) -> impl Display + '_ {
+    s.lazy_replace("'", "''")
 }
 
 /// Convert to Kakoune string by wrapping into quotes and escaping
-pub fn editor_quote(s: &str) -> String {
-    format!("'{}'", editor_escape(s))
+pub fn editor_quote_all<'a>(s: impl IntoIterator<Item = &'a str> + 'a) -> impl Display + 'a {
+    /// Dummy struct needed to take ownership of value to be formatted - `format_args` takes args
+    /// by reference and so causes lifetime errors as the referent is dropped at the end of the
+    /// function.
+    struct Dummy<F>(F);
+
+    impl<F> std::fmt::Display for Dummy<F>
+    where
+        F: Fn(&mut std::fmt::Formatter) -> std::fmt::Result,
+    {
+        fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            (self.0)(f)
+        }
+    }
+
+    let to_format = s.into_iter().map(|s| editor_escape(s)).format("\n\n");
+
+    Dummy(move |f: &mut std::fmt::Formatter| write!(f, "'{}'", to_format))
+}
+
+/// Convert to Kakoune string by wrapping into quotes and escaping
+pub fn editor_quote(s: &str) -> impl Display + '_ {
+    editor_quote_all(std::iter::once(s))
 }
 
 // Cleanup and gracefully exit

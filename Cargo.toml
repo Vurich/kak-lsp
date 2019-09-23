@@ -29,6 +29,7 @@ toml = "0.5.1"
 url = "1.7.2"
 url_serde = "0.2.0"
 whoami = "0.5.3"
+lazy-string-replace = "0.1.1"
 
 [profile.release]
 lto = true

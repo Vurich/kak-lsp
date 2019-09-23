@@ -227,11 +227,12 @@ pub fn apply_text_edits_to_buffer(
     match uri {
         Some(uri) => {
             let buffile = uri.to_file_path().unwrap();
-            format!(
+            let command = format!(
                 "evaluate-commands -buffer {} {}",
                 editor_quote(buffile.to_str().unwrap()),
                 editor_quote(&command)
-            )
+            );
+            command
         }
         None => command,
     }

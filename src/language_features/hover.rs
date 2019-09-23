@@ -9,7 +9,7 @@ use std::str;
 use url::Url;
 
 pub fn text_document_hover(meta: EditorMeta, params: EditorParams, ctx: &mut Context) {
-    let params = PositionParams::deserialize(params).unwrap();
+    let params = HoverParams::deserialize(params).unwrap();
     let req_params = TextDocumentPositionParams {
         text_document: TextDocumentIdentifier {
             uri: Url::from_file_path(&meta.buffile).unwrap(),
@@ -23,7 +23,7 @@ pub fn text_document_hover(meta: EditorMeta, params: EditorParams, ctx: &mut Con
 
 pub fn editor_hover(
     meta: EditorMeta,
-    params: PositionParams,
+    params: HoverParams,
     result: Option<Hover>,
     ctx: &mut Context,
 ) {
@@ -69,28 +69,44 @@ pub fn editor_hover(
         },
     };
 
-    if contents.is_empty() && diagnostics.is_empty() {
-        return;
+    if contents.is_empty() && diagnostics.is_empty() {}
+
+    fn make_hover(pos: KakounePosition, text: impl std::fmt::Display) -> String {
+        format!("lsp-show-hover {} {}", pos, &text)
     }
 
-    let command = if diagnostics.is_empty() {
-        format!(
-            "lsp-show-hover {} {}",
-            params.position,
-            editor_quote(&contents)
-        )
-    } else if contents.is_empty() {
-        format!(
-            "lsp-show-hover {} {}",
-            params.position,
-            editor_quote(&diagnostics)
-        )
-    } else {
-        let info = format!("{}\n\n{}", contents, diagnostics);
-        format!("lsp-show-hover {} {}", params.position, editor_quote(&info))
+    match (
+        params.info_precedence,
+        contents.is_empty(),
+        diagnostics.is_empty(),
+    ) {
+        (_, true, true) => return,
+        (_, true, false) | (HoverPrecedence::DiagnosticsOnly, _, false) => ctx.exec(
+            meta,
+            make_hover(params.position, editor_quote(&diagnostics)),
+        ),
+        (_, false, true) | (HoverPrecedence::InfoOnly, false, _) => {
+            ctx.exec(meta, make_hover(params.position, editor_quote(&contents)))
+        }
+        (HoverPrecedence::DiagnosticsFirst, false, false) => ctx.exec(
+            meta,
+            make_hover(
+                params.position,
+                editor_quote_all(
+                    std::iter::once(&diagnostics[..]).chain(std::iter::once(&contents[..])),
+                ),
+            ),
+        ),
+        (HoverPrecedence::InfoFirst, false, false) => ctx.exec(
+            meta,
+            make_hover(
+                params.position,
+                editor_quote_all(
+                    std::iter::once(&contents[..]).chain(std::iter::once(&diagnostics[..])),
+                ),
+            ),
+        ),
     };
-
-    ctx.exec(meta, command);
 }
 
 trait PlainText {
