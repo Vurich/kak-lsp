@@ -135,11 +135,9 @@ filetype  = "%s"
 version   = %d
 method    = "textDocument/hover"
 
-params.info_precedence = "%s"
-
-[params.position]
-line      = %d
-column    = %d
+[params]
+info_precedence = "%s"
+position = { line = %d, column = %d }
 ' "${kak_session}" "${kak_client}" "${kak_buffile}" "${kak_opt_filetype}" "${kak_timestamp}" "$kak_opt_lsp_hover_precedence" ${kak_cursor_line} ${kak_cursor_column} | ${kak_opt_lsp_cmd} --request) > /dev/null 2>&1 < /dev/null & }
 }
 
