@@ -19,7 +19,7 @@ set-face global Reference MatchingChar
 # Display hover info anchored to the hovered position.
 declare-option -docstring "Display hover info anchored to the hovered position" bool lsp_hover_anchor false
 # Display hover info anchored to the hovered position.
-declare-option -docstring "When both diagnostics and hover info are available, what should be shown. By default the hover info is printed and then the diagnostics below. Options:'diagnostics_only', 'info_only', 'reverse', or 'default'" bool lsp_hover_precedence false
+declare-option -docstring "When both diagnostics and hover info are available, what should be shown. By default the hover info is printed and then the diagnostics below. Options:'diagnostics_only', 'info_only', 'reverse', or 'default'" str lsp_hover_precedence 'default'
 # Completions request is sent only when this expression doesn't fail.
 # By default, it ensures that preceding character is not a whitespace.
 declare-option -docstring "Completions request is sent only when this expression does not fail" str lsp_completion_trigger %{execute-keys '<a-h><a-k>\S.\z<ret>'}
