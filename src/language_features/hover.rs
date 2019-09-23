@@ -92,18 +92,14 @@ pub fn editor_hover(
             meta,
             make_hover(
                 params.position,
-                editor_quote_all(
-                    std::iter::once(&diagnostics[..]).chain(std::iter::once(&contents[..])),
-                ),
+                editor_quote(format_args!("{}\n\n{}", &diagnostics[..], &contents[..])),
             ),
         ),
         (HoverPrecedence::InfoFirst, false, false) => ctx.exec(
             meta,
             make_hover(
                 params.position,
-                editor_quote_all(
-                    std::iter::once(&contents[..]).chain(std::iter::once(&diagnostics[..])),
-                ),
+                editor_quote(format_args!("{}\n\n{}", &contents[..], &diagnostics[..])),
             ),
         ),
     };

@@ -3,7 +3,7 @@ use crate::position::*;
 use crate::text_edit::*;
 use crate::types::*;
 use itertools::Itertools;
-use lazy_string_replace::LazyReplace;
+use lazy_string_replace::LazyReplaceDisplay;
 use libc;
 use lsp_types::request::GotoDefinitionResponse;
 use lsp_types::*;
@@ -109,12 +109,12 @@ pub fn format_document_symbol(
 }
 
 /// Escape Kakoune string wrapped into single quote
-pub fn editor_escape(s: &str) -> impl Display + '_ {
-    s.lazy_replace("'", "''")
+pub fn editor_escape<'a>(s: impl Display + 'a) -> impl Display + 'a {
+    s.replace_display("'", "''")
 }
 
 /// Convert to Kakoune string by wrapping into quotes and escaping
-pub fn editor_quote_all<'a>(s: impl IntoIterator<Item = &'a str> + 'a) -> impl Display + 'a {
+pub fn editor_quote<'a>(s: impl Display + 'a) -> impl Display + 'a {
     /// Dummy struct needed to take ownership of value to be formatted - `format_args` takes args
     /// by reference and so causes lifetime errors as the referent is dropped at the end of the
     /// function.
@@ -129,14 +129,9 @@ pub fn editor_quote_all<'a>(s: impl IntoIterator<Item = &'a str> + 'a) -> impl D
         }
     }
 
-    let to_format = s.into_iter().map(|s| editor_escape(s)).format("\n\n");
+    let to_format = editor_escape(s);
 
     Dummy(move |f: &mut std::fmt::Formatter| write!(f, "'{}'", to_format))
-}
-
-/// Convert to Kakoune string by wrapping into quotes and escaping
-pub fn editor_quote(s: &str) -> impl Display + '_ {
-    editor_quote_all(std::iter::once(s))
 }
 
 // Cleanup and gracefully exit

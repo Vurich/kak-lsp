@@ -70,9 +70,12 @@ pub fn editor_code_actions(
                 let args = &serde_json::to_string(&command.arguments).unwrap();
                 let unquoted_args = serde_json::to_string(&args).unwrap();
                 let args = editor_quote(&unquoted_args);
-                let cmd_string = format!("lsp-execute-command {} {}", cmd, args);
-                let select_cmd = editor_quote(&cmd_string);
-                format!("{} {}", title, select_cmd)
+                let out = format!(
+                    "{} {}",
+                    title,
+                    editor_quote(format!("lsp-execute-command {} {}", cmd, args))
+                );
+                out
             }
             CodeActionOrCommand::CodeAction(action) => {
                 let title = editor_quote(&action.title);
@@ -81,9 +84,12 @@ pub fn editor_code_actions(
                 let args = &serde_json::to_string(&command.arguments).unwrap();
                 let unquoted_args = serde_json::to_string(&args).unwrap();
                 let args = editor_quote(&unquoted_args);
-                let cmd_string = format!("lsp-apply-workspace-edit {} {}", cmd, args);
-                let select_cmd = editor_quote(&cmd_string);
-                format!("{} {}", title, select_cmd)
+                let out = format!(
+                    "{} {}",
+                    title,
+                    editor_quote(format!("lsp-apply-workspace-edit {} {}", cmd, args))
+                );
+                out
             }
         })
         .join(" ");
