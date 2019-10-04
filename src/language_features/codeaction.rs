@@ -81,13 +81,14 @@ pub fn editor_code_actions(
                 let title = editor_quote(&action.title);
                 // Double JSON serialization is performed to prevent parsing args as a TOML
                 // structure when they are passed back via lsp-apply-workspace-edit.
-                let args = &serde_json::to_string(&command.arguments).unwrap();
-                let unquoted_args = serde_json::to_string(&args).unwrap();
-                let args = editor_quote(&unquoted_args);
+                let edit = &serde_json::to_string(&action.edit.unwrap()).unwrap();
+                let unquoted_edit = serde_json::to_string(&edit).unwrap();
+                let edit = editor_quote(&unquoted_edit);
+
                 let out = format!(
                     "{} {}",
                     title,
-                    editor_quote(format!("lsp-apply-workspace-edit {} {}", cmd, args))
+                    editor_quote(format_args!("lsp-apply-workspace-edit {}", edit))
                 );
                 out
             }
