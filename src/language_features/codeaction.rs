@@ -73,7 +73,7 @@ pub fn editor_code_actions(
                 let out = format!(
                     "{} {}",
                     title,
-                    editor_quote(format!("lsp-execute-command {} {}", cmd, args))
+                    editor_quote(&format!("lsp-execute-command {} {}", cmd, args))
                 );
                 out
             }
@@ -88,7 +88,7 @@ pub fn editor_code_actions(
                 let out = format!(
                     "{} {}",
                     title,
-                    editor_quote(format_args!("lsp-apply-workspace-edit {}", edit))
+                    editor_quote(&format!("lsp-apply-workspace-edit {}", edit))
                 );
                 out
             }

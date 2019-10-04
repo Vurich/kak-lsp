@@ -3,7 +3,7 @@ use crate::position::*;
 use crate::text_edit::*;
 use crate::types::*;
 use itertools::Itertools;
-use lazy_string_replace::LazyReplaceDisplay;
+use lazy_string_replace::LazyReplace;
 use libc;
 use lsp_types::request::GotoDefinitionResponse;
 use lsp_types::*;
@@ -109,12 +109,12 @@ pub fn format_document_symbol(
 }
 
 /// Escape Kakoune string wrapped into single quote
-pub fn editor_escape<'a>(s: impl Display + 'a) -> impl Display + 'a {
-    s.replace_display("'", "''")
+pub fn editor_escape<'a>(s: &'a str) -> impl Display + 'a {
+    s.lazy_replace("'", "''")
 }
 
 /// Convert to Kakoune string by wrapping into quotes and escaping
-pub fn editor_quote<'a>(s: impl Display + 'a) -> impl Display + 'a {
+pub fn editor_quote<'a>(s: &'a str) -> impl Display + 'a {
     /// Dummy struct needed to take ownership of value to be formatted - `format_args` takes args
     /// by reference and so causes lifetime errors as the referent is dropped at the end of the
     /// function.

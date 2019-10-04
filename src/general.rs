@@ -147,7 +147,7 @@ pub fn capabilities(meta: EditorMeta, ctx: &mut Context) {
     let command = format!(
         "info 'kak-lsp commands supported by {} language server:\n\n{}'",
         ctx.language_id,
-        editor_escape(&features.join("\n"))
+        editor_escape(&features.join("\n").to_string())
     );
     ctx.exec(meta, command);
 }
